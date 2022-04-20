@@ -32,7 +32,34 @@ public class ProductController {
             }
             return new ResponseEntity<>(products,HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable("id") long id){
+        Optional<Product> _product = productRepository.findById(id);
+        try {
+            if (_product.isPresent()){
+                return new ResponseEntity<>(_product.get(),HttpStatus.OK);
+            }else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/products/name")
+    public ResponseEntity<Product> getByName(@RequestParam String name){
+        try {
+            Optional<Product> _product = productRepository.findByName(name);
+            if (_product.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(_product.get(), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -44,7 +71,7 @@ public class ProductController {
                     .save(new Product(product.getName(), product.getDescription(), product.getPrice(), true,product.getCount()));
             return new ResponseEntity<>(_product, HttpStatus.CREATED);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,10 +88,10 @@ public class ProductController {
                _product.setCount(product.getCount());
                return new ResponseEntity<>(productRepository.save(_product), HttpStatus.ACCEPTED);
            }else {
-               return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+               return new ResponseEntity<>(HttpStatus.NOT_FOUND);
            }
        }catch (Exception e){
-           return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
        }
     }
 
@@ -87,7 +114,4 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }
